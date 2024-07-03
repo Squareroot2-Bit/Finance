@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { ref, defineProps } from 'vue'
 defineProps<{
   msg: string
 }>()
+const value1 = ref(true);
 </script>
 
 <template>
@@ -12,6 +14,13 @@ defineProps<{
       <a href="https://vitejs.dev/" target="_blank" rel="noopener">Vite</a> +
       <a href="https://vuejs.org/" target="_blank" rel="noopener">Vue 3</a>. What's next?
     </h3>
+  </div>
+  <div>
+    <el-switch
+      v-model="value1"
+      class="m-2"
+      style="--ep-switch-on-color: #13ce66; --ep-switch-off-color: gray;"
+    />
   </div>
 </template>
 

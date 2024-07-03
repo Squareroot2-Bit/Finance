@@ -1,3 +1,8 @@
+<script setup lang="ts">
+import { ref } from 'vue';
+import { ElMessage } from "element-plus";
+const value1 = ref(false);
+</script>
 <template>
   <div class="item">
     <i>
@@ -9,6 +14,13 @@
       </h3>
       <slot></slot>
     </div>
+  </div>
+  <div>
+    <el-switch
+      v-model="value1"
+      class="m-2"
+      style="--ep-switch-on-color: #13ce66; --ep-switch-off-color: gray;"
+    />
   </div>
 </template>
 
