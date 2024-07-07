@@ -1,9 +1,20 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
+import { logout } from '@/http/api'
+import router from '@/router'
+function userLogout() {
+  logout()
+    .then((res) => {
+      console.log(res)
+      router.push('/')
+    })
+    .catch((error) => {
+      console.error('Logout failed:', error)
+    })
+}
 </script>
 
 <template>
-  <main>
-    <TheWelcome />
-  </main>
+  <div>
+    <el-button>退出登录</el-button>
+  </div>
 </template>
