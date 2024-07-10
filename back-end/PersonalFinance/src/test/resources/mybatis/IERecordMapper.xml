@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lwjandlyw.personalfinance.mapper.IERecordMapper">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="record_id">
+        insert into record (income, user_id, money, "date", tag, remark)
+        values (#{income}, #{user_id}, #{money}, datetime('now','+8 hour'), #{tag}, #{remark});
+    </insert>
+</mapper>
