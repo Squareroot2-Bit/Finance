@@ -12,7 +12,7 @@ describe('API Functions', () => {
   })
 
   it('登录成功', async () => {
-    const loginData = { userName: 'testuser', password: 'testpass' }
+    const loginData = { username: 'testuser', password: 'testpass' }
     mock
       .onPost('http://localhost:8080/login')
       .reply(200, { code: 0, message: '登录成功', data: null })
@@ -21,7 +21,7 @@ describe('API Functions', () => {
     expect(response.data).toEqual(null)
   })
   it('用户不存在', async () => {
-    const loginData = { userName: 'nonexistuser', password: 'testpass' }
+    const loginData = { username: 'nonexistuser', password: 'testpass' }
     mock
       .onPost('http://localhost:8080/login')
       .reply(200, { code: -1, message: '用户不存在', data: null })
@@ -33,7 +33,7 @@ describe('API Functions', () => {
     }
   })
   it('密码错误', async () => {
-    const loginData = { userName: 'testuser', password: 'wrongpass' }
+    const loginData = { username: 'testuser', password: 'wrongpass' }
     mock
       .onPost('http://localhost:8080/login')
       .reply(200, { code: -2, message: '密码错误', data: null })
@@ -45,7 +45,7 @@ describe('API Functions', () => {
     }
   })
   it('注册成功', async () => {
-    const registerData = { userName: 'testuser', password: 'testpass' }
+    const registerData = { username: 'testuser', password: 'testpass' }
     mock
       .onPost('http://localhost:8080/register')
       .reply(200, { code: 0, message: '注册成功', data: null })
@@ -54,7 +54,7 @@ describe('API Functions', () => {
     expect(response.data).toEqual(null)
   })
   it('用户名已存在', async () => {
-    const loginData = { userName: 'testuser', password: 'wrongpass' }
+    const loginData = { username: 'testuser', password: 'wrongpass' }
     mock
       .onPost('http://localhost:8080/login')
       .reply(200, { code: -3, message: '用户名已存在', data: null })

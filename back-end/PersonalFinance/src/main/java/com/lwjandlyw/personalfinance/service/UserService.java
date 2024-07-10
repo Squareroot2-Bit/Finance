@@ -27,7 +27,7 @@ public class UserService {
             user.setPassword(userBody.getPassword());
             user.setNickname(userBody.getUsername());
             return userMapper.insert(user);
-        } else return -1;
+        } else return -3;
     }
 
     public int login(UserBody userBody) {
