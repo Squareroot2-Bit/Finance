@@ -24,12 +24,12 @@ public class IERecordService {
         return recordMapper.selectUserByUserid(user_id);
     }
 
-    public List<IERecord> getRecordByUseridDivideByIncome(int user_id, boolean is_income) {
+/*    public List<IERecord> getRecordByUseridDivideByIncome(int user_id, boolean is_income) {
         return recordMapper.selectUserByUserid(user_id)
                 .stream()
                 .filter(record -> record.isIncome() == is_income)
                 .toList();
-    }
+    }*/
 
     public List<IERecord> getRecordByUseridDivideByTag(int user_id, int tag) {
         return recordMapper.selectUserByUserid(user_id)
