@@ -36,6 +36,7 @@
           plain
           style="width: 100%; text-align: center"
           @click="submitForm(loginFormRef)"
+          name="login"
         >
           登录
         </el-button>
@@ -43,7 +44,7 @@
     </el-form>
 
     <div>
-      <el-button @click="router.push('/register')" link>注册账号</el-button>
+      <el-button name="toregister" @click="router.push('/register')" link>注册账号</el-button>
     </div>
   </div>
 </template>
@@ -62,15 +63,19 @@ export default defineComponent({
       password: [{ required: true, message: '请输入密码！', trigger: ['blur', 'change'] }]
     })
     const submitForm = async (formEl: FormInstance | undefined) => {
+      localStorage.removeItem('token')
+      // console.log(formEl)
       if (!formEl) return
       await formEl.validate((valid, fields) => {
         if (valid) {
           // console.log(data.loginForm)
-          login(data.loginForm).then((res) => {
-            console.log(res)
-            localStorage.setItem('token', res.data.token)
-            router.push('/home')
-          })
+          // login(data.loginForm).then((res) => {
+          //   console.log(res)
+          //   localStorage.setItem('token', data.loginForm.userName)
+          //   router.push('/home')
+          // })
+          localStorage.setItem('token', data.loginForm.userName)
+          router.push('/home')
         } else {
           console.log('error submit!', fields)
         }

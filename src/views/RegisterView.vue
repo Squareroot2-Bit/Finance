@@ -33,12 +33,12 @@ const registerForm = reactive({
 
 const rules = reactive({
   userName: [
-    { min: 2, max: 8, message: '用户名的长度必须在2-8个字符之间', trigger: ['blur', 'change'] },
+    { min: 3, max: 12, message: '用户名的长度必须在3-12个字符之间', trigger: ['blur', 'change'] },
     { validator: validateName, trigger: 'blur' }
   ],
   password: [
     { required: true, message: '请输入密码', trigger: ['blur', 'change'] },
-    { min: 6, max: 16, message: '密码长度在 6 到 20 个字符', trigger: 'blur' }
+    { min: 6, max: 16, message: '密码长度在 6 到 16 个字符', trigger: 'blur' }
   ],
   password_repeat: [
     { required: true, message: '请再次输入密码', trigger: ['blur', 'change'] },
@@ -54,13 +54,13 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         password: registerForm.password
       }
       console.log(loginFormData)
-      //   register(loginFormData).then((res) => {
-      //     console.log(res)
-      //     ElMessage.success('注册成功，欢迎加入我们')
-      //     router.push('/')
-      //   })
-      ElMessage.success('注册成功，欢迎加入我们')
-      router.push('/')
+      register(loginFormData).then((res) => {
+        console.log(res)
+        ElMessage.success('注册成功，欢迎加入我们')
+        router.push('/')
+      })
+      // ElMessage.success('注册成功，欢迎加入我们')
+      // router.push('/')
     } else {
       console.log('error submit!', fields)
     }
@@ -109,7 +109,12 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       </el-form>
     </div>
     <div style="margin-top: 40px">
-      <el-button style="width: 270px" type="warning" @click="submitForm(registerFormRef)" plain
+      <el-button
+        name="register"
+        style="width: 270px"
+        type="warning"
+        @click="submitForm(registerFormRef)"
+        plain
         >立即注册</el-button
       >
     </div>

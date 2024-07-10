@@ -1,29 +1,31 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
-enum HTTP_STATUS {
-  '成功' = 200,
-  '用户不存在',
-  '密码错误',
-  '目标用户名已存在',
-  'ERROR' = 500
+enum JSON_STATUS {
+  '成功' = 0,
+  '用户不存在' = -1,
+  '密码错误' = -2,
+  '目标用户名已存在' = -3
 }
+
 const getCurrentUrl = () => {
   console.log(window.location.origin)
   return window.location.origin
 }
 const $http = axios.create({
   timeout: 2000,
+  baseURL: 'http://localhost:8080',
   headers: {
     'Content-Type': 'application/json;charset=UTF-8'
+    // Authorization: 'Bearer ' + localStorage.getItem('token') || ''
   }
 })
 
 $http.interceptors.request.use(
   (config) => {
     config.headers = config.headers || {}
-    if (localStorage.getItem('token')) {
-      config.headers.token = localStorage.getItem('token') || ''
-    }
+    // if (localStorage.getItem('token')) {
+    //   config.headers.token = localStorage.getItem('token') || ''
+    // }
     return config
   },
   (error) => {
@@ -36,9 +38,10 @@ $http.interceptors.request.use(
 $http.interceptors.response.use(
   (res) => {
     const code: number = res.data.code
-    if (code !== 200) {
-      ElMessage.error(HTTP_STATUS[code])
-      return Promise.reject(res.data)
+
+    if (code < 0) {
+      ElMessage.error(JSON_STATUS[code])
+      return Promise.reject(res.data.message)
     }
     return res.data
   },
