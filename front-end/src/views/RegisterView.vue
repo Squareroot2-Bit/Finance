@@ -26,13 +26,13 @@ const validatePass2 = (rule: any, value: string, callback: any) => {
 }
 
 const registerForm = reactive({
-  userName: '',
+  username: '',
   password: '',
   password_repeat: ''
 })
 
 const rules = reactive({
-  userName: [
+  username: [
     { min: 3, max: 12, message: '用户名的长度必须在3-12个字符之间', trigger: ['blur', 'change'] },
     { validator: validateName, trigger: 'blur' }
   ],
@@ -50,7 +50,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       const loginFormData: LoginFormStr = {
-        userName: registerForm.userName,
+        username: registerForm.username,
         password: registerForm.password
       }
       console.log(loginFormData)
@@ -75,8 +75,8 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     </div>
     <div style="margin-top: 50px">
       <el-form :model="registerForm" :rules="rules" ref="registerFormRef">
-        <el-form-item prop="userName">
-          <el-input v-model="registerForm.userName" :maxlength="8" type="text" placeholder="用户名">
+        <el-form-item prop="username">
+          <el-input v-model="registerForm.username" :maxlength="8" type="text" placeholder="用户名">
             <template #prefix>
               <el-icon><User /></el-icon>
             </template>

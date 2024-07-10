@@ -5,8 +5,8 @@
     </div>
     <div style="margin-top: 50px"></div>
     <el-form ref="loginFormRef" :model="loginForm" :rules="rules" hide-required-asterisk>
-      <el-form-item prop="userName">
-        <el-input v-model="loginForm.userName" maxlength="10" placeholder="用户名">
+      <el-form-item prop="username">
+        <el-input v-model="loginForm.username" maxlength="10" placeholder="用户名">
           <template #prefix>
             <el-icon>
               <User />
@@ -59,7 +59,7 @@ export default defineComponent({
   setup() {
     const data = reactive(new InitLoginForm())
     const rules = reactive({
-      userName: [{ required: true, message: '请输入用户名！', trigger: ['blur', 'change'] }],
+      username: [{ required: true, message: '请输入用户名！', trigger: ['blur', 'change'] }],
       password: [{ required: true, message: '请输入密码！', trigger: ['blur', 'change'] }]
     })
     const submitForm = async (formEl: FormInstance | undefined) => {
@@ -68,14 +68,14 @@ export default defineComponent({
       if (!formEl) return
       await formEl.validate((valid, fields) => {
         if (valid) {
-          // console.log(data.loginForm)
-          // login(data.loginForm).then((res) => {
-          //   console.log(res)
-          //   localStorage.setItem('token', data.loginForm.userName)
-          //   router.push('/home')
-          // })
-          localStorage.setItem('token', data.loginForm.userName)
-          router.push('/home')
+          console.log(data.loginForm)
+          login(data.loginForm).then((res) => {
+            console.log(res)
+            localStorage.setItem('token', data.loginForm.username)
+            router.push('/home')
+          })
+          // localStorage.setItem('token', data.loginForm.userName)
+          // router.push('/home')
         } else {
           console.log('error submit!', fields)
         }

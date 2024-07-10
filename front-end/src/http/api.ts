@@ -1,6 +1,6 @@
 import $http from './http_index'
 interface LoginFormStr {
-  userName: string
+  username: string
   password: string
 }
 

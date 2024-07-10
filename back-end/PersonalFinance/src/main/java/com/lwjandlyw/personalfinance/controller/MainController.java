@@ -39,7 +39,7 @@ public class MainController {
         String message;
         if (register >= 0) {
             message = "注册成功";
-        } else if (register == -1) {
+        } else if (register == -3) {
             message = "用户名重复";
         } else
             message = "未知错误";
