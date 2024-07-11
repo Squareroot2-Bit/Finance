@@ -8,9 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @ClassName IERecordServiceTest
@@ -27,23 +27,14 @@ class IERecordServiceTest {
 
     @Test
     @Transactional
-    void getRecordByUserid() {
-        for (int user_id = 1; user_id <= 2; user_id++) {
-            List<IERecord> recordByUserid =
-                    service.getRecordByUserid(user_id);
-            for (IERecord record : recordByUserid) {
-                assert record.getUser_id() == user_id;
-            }
-        }
-    }
-
-    @Test
-    @Transactional
     void getRecordByUseridDivideByTag() {
         int tag = 1;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime startDate = LocalDateTime.parse("1900-01-01 00:00:00", formatter);
+        LocalDateTime endDate = LocalDateTime.parse("2099-12-31 23:59:59", formatter);
         for (int user_id = 1; user_id <= 2; user_id++) {
             List<IERecord> recordByUserid =
-                    service.getRecordByUseridDivideByTag(user_id, tag);
+                    service.getRecordByUserid(user_id, tag, startDate, endDate);
             for (IERecord record : recordByUserid) {
                 assert record.getUser_id() == user_id;
                 assert record.getTag() == tag;
@@ -57,10 +48,16 @@ class IERecordServiceTest {
         IERecordBody recordBody =
                 new IERecordBody(250, 1, "收入2.50元");
         int user_id = 1;
-        List<IERecord> recordsBeforeInsert = service.getRecordByUserid(user_id);
+        int tag = 0;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime startDate = LocalDateTime.parse("1900-01-01 00:00:00", formatter);
+        LocalDateTime endDate = LocalDateTime.parse("2099-12-31 23:59:59", formatter);
+        List<IERecord> recordsBeforeInsert =
+                service.getRecordByUserid(user_id, tag, startDate, endDate);
         int insert = service.insert(recordBody, user_id);
         assert insert == 1;
-        List<IERecord> recordsAfterInsert = service.getRecordByUserid(user_id);
+        List<IERecord> recordsAfterInsert =
+                service.getRecordByUserid(user_id, tag, startDate, endDate);
         assert recordsAfterInsert.size() == recordsBeforeInsert.size() + 1;
     }
 }
