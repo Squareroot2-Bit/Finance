@@ -10,14 +10,14 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * @ClassName MainController
@@ -57,15 +57,14 @@ public class MainController {
                           HttpServletResponse response) {
         int login = userService.login(userBody);
         int code;
+        Object data;
         String message;
         if (login >= 0) {
             code = 0;
-            Integer uid = login;
             message = "登录成功。";
-            Cookie uidCookie = new Cookie("user_id", uid.toString());
-            uidCookie.setMaxAge(24 * 60 * 60);
-            uidCookie.setPath(request.getContextPath());
-            response.addCookie(uidCookie);
+            record UserID(Integer user_id) {
+            }
+            data = new UserID(login);
         } else {
             code = login;
             message = switch (login) {
@@ -73,8 +72,9 @@ public class MainController {
                 case -2 -> "密码错误。";
                 default -> "未知错误。";
             };
+            data = null;
         }
-        return new Response(code, message, null);
+        return new Response(code, message, data);
     }
 
     @PostMapping("/record")
@@ -114,13 +114,19 @@ public class MainController {
             message = "未登录";
             return new Response(code, message, null);
         }
-        int delete = recordService.delete(record_id);
-        if (delete == 1) {
-            code = 0;
-            message = "添加成功";
-        } else {
-            code = -2;
-            message = "删除失败";
+        IERecord record = recordService.getRecordByRecordid(record_id);
+        if (record != null && record.getUser_id() == user_id) {
+            int delete = recordService.delete(record_id);
+            if (delete == 1) {
+                code = 0;
+                message = "删除成功";
+            } else {
+                code = -2;
+                message = "删除失败";
+            }
+        }else{
+            code = -3;
+            message = "无权限删除";
         }
         return new Response(code, message, null);
     }
@@ -166,12 +172,14 @@ public class MainController {
     }
 
     int verifyingLogin(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) return -1;
-        List<Cookie> userIdCookies = Arrays.stream(cookies)
-                .filter(cookie -> cookie.getName().equals("user_id"))
-                .toList();
-        if (userIdCookies.isEmpty()) return -1;
-        return Integer.parseInt(userIdCookies.get(0).getValue());
+        // 未登录返回-1
+        int user_id = -1;
+        if (Collections.list(request.getHeaderNames()).contains("user-id")) {
+            try {
+                user_id = request.getIntHeader("user-id");
+            } catch (NumberFormatException ignore) {
+            }
+        }
+        return user_id;
     }
 }
