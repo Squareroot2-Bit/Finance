@@ -15,10 +15,10 @@ describe('API Functions', () => {
     const loginData = { username: 'testuser', password: 'testpass' }
     mock
       .onPost('http://localhost:8080/login')
-      .reply(200, { code: 0, message: '登录成功', data: null })
+      .reply(200, { code: 0, message: '登录成功', data: 1 })
 
     const response = await login(loginData)
-    expect(response.data).toEqual(null)
+    expect(response.data).toEqual(1)
   })
   it('用户不存在', async () => {
     const loginData = { username: 'nonexistuser', password: 'testpass' }

@@ -68,14 +68,15 @@ export default defineComponent({
       if (!formEl) return
       await formEl.validate((valid, fields) => {
         if (valid) {
-          // console.log(data.loginForm)
-          // login(data.loginForm).then((res) => {
-          //   console.log(res)
-          //   localStorage.setItem('token', data.loginForm.username)
-          //   router.push('/home')npm
-          // })
-          localStorage.setItem('token', data.loginForm.username)
-          router.push('/home')
+          console.log(data.loginForm)
+          login(data.loginForm).then((res) => {
+            console.log(res)
+            localStorage.setItem('user_id', res.data.user_id)
+            localStorage.setItem('token', data.loginForm.username)
+            router.push('/home')
+          })
+          // localStorage.setItem('token', data.loginForm.username)
+          // router.push('/home')
         } else {
           console.log('error submit!', fields)
         }

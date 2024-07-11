@@ -22,6 +22,7 @@ function userLogout() {
   //     console.error('Logout failed:', error)
   //   })
   localStorage.removeItem('token')
+  localStorage.removeItem('user_id')
   router.push('/')
   ElMessage.success('退出登录成功')
 }

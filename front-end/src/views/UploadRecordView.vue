@@ -96,14 +96,17 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
+
       recordForm.money*=100
-      // record(recordForm).then(res => {
-      //   ElMessage.success('新增记录成功')
-      // }).catch(err => {
-      //   console.log(err)
-      // })
-      recordFormRef.value?.resetFields()
       console.log(recordForm)
+      record(recordForm).then(res => {
+        console.log(res)
+        ElMessage.success('新增记录成功')
+      }).catch(err => {
+        console.log(err)
+      })
+      recordFormRef.value?.resetFields()
+      
 
     } else {
       console.log('error submit!', fields)
