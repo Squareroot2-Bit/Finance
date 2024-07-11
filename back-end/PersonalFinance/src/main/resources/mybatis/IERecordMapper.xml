@@ -5,6 +5,6 @@
 <mapper namespace="com.lwjandlyw.personalfinance.mapper.IERecordMapper">
     <insert id="insert" useGeneratedKeys="true" keyProperty="record_id">
         insert into record (income, user_id, money, "date", tag, remark)
-        values (#{income}, #{user_id}, #{money}, datetime('now','+8 hour'), #{tag}, #{remark});
+        values (#{income}, #{user_id}, #{money}, datetime('now'), #{tag}, #{remark});
     </insert>
 </mapper>

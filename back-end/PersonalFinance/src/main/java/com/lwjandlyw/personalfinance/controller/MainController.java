@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,6 +29,8 @@ import java.util.List;
 @Controller
 @CrossOrigin
 public class MainController {
+
+    static DateTimeFormatter Formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
     @Autowired
     UserService userService;
     @Autowired
@@ -106,7 +110,54 @@ public class MainController {
         return new Response(code, message, null);
     }
 
-    @GetMapping("/record/view/{type}/{tag}")
+    @GetMapping("/record/view/{type}/{tag}/{start-date}/{end-date}")
+    public Response viewRecord(@PathVariable("type") Integer type,
+                               @PathVariable("tag") Integer tag,
+                               @PathVariable("start-date") String startDateStr,
+                               @PathVariable("end-date") String endDateStr,
+                               HttpSession session,
+                               HttpServletRequest request,
+                               HttpServletResponse response) {
+        int code;
+        String message;
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            code = -1;
+            message = "未登录";
+            return new Response(code, message, null);
+        }
+        List<Cookie> userIdCookies = Arrays.stream(cookies)
+                .filter(cookie -> cookie.getName().equals("user_id"))
+                .toList();
+        if (userIdCookies.isEmpty()) {
+            code = -1;
+            message = "未登录";
+            return new Response(code, message, null);
+        }
+        int user_id = Integer.parseInt(userIdCookies.get(0).getValue());
+        if (type >= 0 && type <= 2) {
+            LocalDateTime startDate =
+                    LocalDateTime.parse(startDateStr + "000000", Formatter);
+            LocalDateTime endDate =
+                    LocalDateTime.parse(endDateStr + "240000", Formatter);
+            List<IERecord> temp =
+                    recordService.getRecordByUserid(user_id, tag, startDate, endDate);
+            code = 0;
+            message = "查询成功";
+            List<IERecord> data = switch (type) {
+                case 0 -> temp;
+                case 1 -> temp.stream().filter(IERecord::isIncome).toList();
+                case 2 -> temp.stream().filter(record -> !record.isIncome()).toList();
+                default -> throw new IllegalStateException("Unexpected value: " + type);
+            };
+            return new Response(code, message, data);
+        } else {
+            code = -2;
+            message = "type 错误";
+            return new Response(code, message, null);
+        }
+    }
+    /*@GetMapping("/record/view/{type}/{tag}")
     public Response viewRecord(@PathVariable("type") String type,
                                @PathVariable("tag") String tag,
                                HttpSession session,
@@ -194,5 +245,5 @@ public class MainController {
                 }
             }
         }
-    }
+    }*/
 }
