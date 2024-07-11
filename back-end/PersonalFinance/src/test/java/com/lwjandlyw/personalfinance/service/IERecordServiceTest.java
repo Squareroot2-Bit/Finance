@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -27,11 +27,21 @@ class IERecordServiceTest {
 
     @Test
     @Transactional
+    void getRecordByRecordid() {
+        for (int record_id = 0; record_id <= 5; record_id++) {
+            IERecord record = service.getRecordByRecordid(record_id);
+            assert (record != null) == (record_id > 0 && record_id <= 4);
+            assert record == null || record.getRecord_id() == record_id;
+        }
+    }
+
+    @Test
+    @Transactional
     void getRecordByUseridDivideByTag() {
         int tag = 1;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime startDate = LocalDateTime.parse("1900-01-01 00:00:00", formatter);
-        LocalDateTime endDate = LocalDateTime.parse("2099-12-31 23:59:59", formatter);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate startDate = LocalDate.parse("1900-01-01", formatter);
+        LocalDate endDate = LocalDate.parse("2099-12-31", formatter);
         for (int user_id = 1; user_id <= 2; user_id++) {
             List<IERecord> recordByUserid =
                     service.getRecordByUserid(user_id, tag, startDate, endDate);
@@ -46,12 +56,12 @@ class IERecordServiceTest {
     @Transactional
     void insert() {
         IERecordBody recordBody =
-                new IERecordBody(250, 1, "收入2.50元");
+                new IERecordBody("20240120", 250, 1, "收入2.50元");
         int user_id = 1;
         int tag = 0;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime startDate = LocalDateTime.parse("1900-01-01 00:00:00", formatter);
-        LocalDateTime endDate = LocalDateTime.parse("2099-12-31 23:59:59", formatter);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate startDate = LocalDate.parse("1900-01-01", formatter);
+        LocalDate endDate = LocalDate.parse("2099-12-31", formatter);
         List<IERecord> recordsBeforeInsert =
                 service.getRecordByUserid(user_id, tag, startDate, endDate);
         int insert = service.insert(recordBody, user_id);
@@ -60,4 +70,15 @@ class IERecordServiceTest {
                 service.getRecordByUserid(user_id, tag, startDate, endDate);
         assert recordsAfterInsert.size() == recordsBeforeInsert.size() + 1;
     }
+
+    @Test
+    @Transactional
+    void delete() {
+        for (int record_id = 0; record_id <= 5; record_id++) {
+            int delete = service.delete(record_id);
+            assert (delete == 1) == (record_id > 0 && record_id <= 4);
+        }
+    }
+
+
 }
