@@ -1,7 +1,6 @@
 package com.lwjandlyw.personalfinance.mapper;
 
 import com.lwjandlyw.personalfinance.pojo.IERecord;
-import com.lwjandlyw.personalfinance.pojo.User;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -22,7 +21,7 @@ public interface IERecordMapper {
             from record
             where record_id = #{record_id}
             """)
-    List<IERecord> selectUserByRecordid(int record_id);
+    List<IERecord> selectRecordsByRecordid(int record_id);
 
     @Select("""
             select record_id, income, user_id, money, "date", tag, remark
@@ -31,7 +30,7 @@ public interface IERecordMapper {
             and datetime("date") >= datetime(#{startDate})
             and datetime("date") <= datetime(#{endDate})
             """)
-    List<IERecord> selectUserByUserid(
+    List<IERecord> selectRecordsByUserid(
             int user_id, LocalDateTime startDate, LocalDateTime endDate);
 
     int insert(IERecord record);

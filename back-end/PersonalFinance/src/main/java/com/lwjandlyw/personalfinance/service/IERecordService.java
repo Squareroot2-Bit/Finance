@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 
 /**
@@ -22,10 +21,16 @@ public class IERecordService {
     @Autowired
     IERecordMapper recordMapper;
 
+    public IERecord getRecordByRecordid(int record_id) {
+        List<IERecord> recordList = recordMapper.selectRecordsByRecordid(record_id);
+        if (recordList.size() == 1) return recordList.get(0);
+        else return null;
+    }
+
     public List<IERecord> getRecordByUserid(
             int user_id, int tag, LocalDateTime startDate, LocalDateTime endDate) {
         List<IERecord> RecordsByUserid = recordMapper
-                .selectUserByUserid(user_id, startDate, endDate);
+                .selectRecordsByUserid(user_id, startDate, endDate);
         if (tag == 0) return RecordsByUserid;
         else return RecordsByUserid.stream()
                 .filter(record -> record.getTag() == tag)

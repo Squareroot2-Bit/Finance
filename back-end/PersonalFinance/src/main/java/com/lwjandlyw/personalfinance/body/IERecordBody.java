@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class IERecordBody {
+    String date;
     long money;
     int tag;
     String remark;
