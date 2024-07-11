@@ -6,19 +6,17 @@ import com.lwjandlyw.personalfinance.pojo.IERecord;
 import com.lwjandlyw.personalfinance.response.Response;
 import com.lwjandlyw.personalfinance.service.IERecordService;
 import com.lwjandlyw.personalfinance.service.UserService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @ClassName MainController
