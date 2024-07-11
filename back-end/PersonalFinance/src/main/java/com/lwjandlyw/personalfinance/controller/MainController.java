@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -30,7 +31,7 @@ import java.util.*;
 @CrossOrigin
 public class MainController {
 
-    static DateTimeFormatter Formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    static DateTimeFormatter Formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
     @Autowired
     UserService userService;
     @Autowired
@@ -149,10 +150,10 @@ public class MainController {
             return new Response(code, message, null);
         }
         if (type >= 0 && type <= 2) {
-            LocalDateTime startDate =
-                    LocalDateTime.parse(startDateStr + "000000", Formatter);
-            LocalDateTime endDate =
-                    LocalDateTime.parse(endDateStr + "240000", Formatter);
+            LocalDate startDate =
+                    LocalDate.parse(startDateStr, Formatter);
+            LocalDate endDate =
+                    LocalDate.parse(endDateStr, Formatter);
             List<IERecord> temp =
                     recordService.getRecordByUserid(user_id, tag, startDate, endDate);
             code = 0;

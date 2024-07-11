@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -27,11 +28,11 @@ public interface IERecordMapper {
             select record_id, income, user_id, money, "date", tag, remark
             from record
             where user_id = #{user_id}
-            and datetime("date") >= datetime(#{startDate})
-            and datetime("date") <= datetime(#{endDate})
+            and date("date") >= date(#{startDate})
+            and date("date") <= date(#{endDate})
             """)
     List<IERecord> selectRecordsByUserid(
-            int user_id, LocalDateTime startDate, LocalDateTime endDate);
+            int user_id, LocalDate startDate, LocalDate endDate);
 
     int insert(IERecord record);
 

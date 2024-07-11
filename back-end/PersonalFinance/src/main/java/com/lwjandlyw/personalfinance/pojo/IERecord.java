@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -20,7 +21,7 @@ public class IERecord {
     boolean income;
     int user_id;
     long money;
-    LocalDateTime date;
+    LocalDate date;
     int tag;
     String remark;
 }
