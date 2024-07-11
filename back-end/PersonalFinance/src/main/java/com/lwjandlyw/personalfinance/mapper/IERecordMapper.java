@@ -5,6 +5,7 @@ import com.lwjandlyw.personalfinance.pojo.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -26,8 +27,11 @@ public interface IERecordMapper {
             select record_id, income, user_id, money, "date", tag, remark
             from record
             where user_id = #{user_id}
+            and datetime("date") >= datetime(#{startDate})
+            and datetime("date") <= datetime(#{endDate})
             """)
-    List<IERecord> selectUserByUserid(int user_id);
+    List<IERecord> selectUserByUserid(
+            int user_id, LocalDateTime startDate, LocalDateTime endDate);
 
     int insert(IERecord record);
 }
