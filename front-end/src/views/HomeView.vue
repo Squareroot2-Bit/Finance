@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ArrowDown } from '@element-plus/icons-vue'
 import { logout } from '@/http/api'
+import type { FormInstance } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import router from '@/router'
 import { useRouter } from 'vue-router'
 import { RouterView } from 'vue-router'
-import { it } from 'node:test'
 const Name = localStorage.getItem('token')
 const homeRouter = useRouter()
 const list = homeRouter.getRoutes().filter((v) => v.meta.homeList)
@@ -54,7 +54,7 @@ function userLogout() {
         </el-row>
       </el-header>
       <el-container>
-        <el-aside width="200px">
+        <el-aside width="150px">
           <el-menu default-active="2" class="menu" router>
             <el-menu-item v-for="item in list" :key="item.path" :index="item.path">
               <span>{{ item.meta.title }}</span>
