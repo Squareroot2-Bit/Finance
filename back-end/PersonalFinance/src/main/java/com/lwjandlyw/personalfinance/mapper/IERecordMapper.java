@@ -2,6 +2,7 @@ package com.lwjandlyw.personalfinance.mapper;
 
 import com.lwjandlyw.personalfinance.pojo.IERecord;
 import com.lwjandlyw.personalfinance.pojo.User;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -34,4 +35,11 @@ public interface IERecordMapper {
             int user_id, LocalDateTime startDate, LocalDateTime endDate);
 
     int insert(IERecord record);
+
+    @Delete("""
+            delete
+            from record
+            where record_id = #{record_id}
+            """)
+    int delete(int record_id);
 }

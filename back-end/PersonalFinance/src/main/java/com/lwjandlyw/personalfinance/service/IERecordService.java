@@ -41,4 +41,10 @@ public class IERecordService {
         record.setRemark(recordBody.getRemark());
         return recordMapper.insert(record);
     }
+
+    public int delete(int record_id) {
+        return recordMapper.delete(record_id);
+    }
+
+
 }

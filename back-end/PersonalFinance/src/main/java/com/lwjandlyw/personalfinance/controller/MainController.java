@@ -84,21 +84,12 @@ public class MainController {
                            HttpServletResponse response) {
         int code;
         String message;
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
+        int user_id = verifyingLogin(request);
+        if (user_id < 0) {
             code = -1;
             message = "未登录";
             return new Response(code, message, null);
         }
-        List<Cookie> userIdCookies = Arrays.stream(cookies)
-                .filter(cookie -> cookie.getName().equals("user_id"))
-                .toList();
-        if (userIdCookies.isEmpty()) {
-            code = -1;
-            message = "未登录";
-            return new Response(code, message, null);
-        }
-        int user_id = Integer.parseInt(userIdCookies.get(0).getValue());
         int record = recordService.insert(recordBody, user_id);
         if (record > 0) {
             code = 0;
@@ -110,6 +101,31 @@ public class MainController {
         return new Response(code, message, null);
     }
 
+    @PostMapping("/record/delete")
+    public Response deleteRecord(@RequestParam("record_id") Integer record_id,
+                                 HttpSession session,
+                                 HttpServletRequest request,
+                                 HttpServletResponse response) {
+        int code;
+        String message;
+        int user_id = verifyingLogin(request);
+        if (user_id < 0) {
+            code = -1;
+            message = "未登录";
+            return new Response(code, message, null);
+        }
+        int delete = recordService.delete(record_id);
+        if (delete == 1) {
+            code = 0;
+            message = "添加成功";
+        } else {
+            code = -2;
+            message = "删除失败";
+        }
+        return new Response(code, message, null);
+    }
+
+
     @GetMapping("/record/view/{type}/{tag}/{start-date}/{end-date}")
     public Response viewRecord(@PathVariable("type") Integer type,
                                @PathVariable("tag") Integer tag,
@@ -120,21 +136,12 @@ public class MainController {
                                HttpServletResponse response) {
         int code;
         String message;
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
+        int user_id = verifyingLogin(request);
+        if (user_id < 0) {
             code = -1;
             message = "未登录";
             return new Response(code, message, null);
         }
-        List<Cookie> userIdCookies = Arrays.stream(cookies)
-                .filter(cookie -> cookie.getName().equals("user_id"))
-                .toList();
-        if (userIdCookies.isEmpty()) {
-            code = -1;
-            message = "未登录";
-            return new Response(code, message, null);
-        }
-        int user_id = Integer.parseInt(userIdCookies.get(0).getValue());
         if (type >= 0 && type <= 2) {
             LocalDateTime startDate =
                     LocalDateTime.parse(startDateStr + "000000", Formatter);
@@ -157,93 +164,14 @@ public class MainController {
             return new Response(code, message, null);
         }
     }
-    /*@GetMapping("/record/view/{type}/{tag}")
-    public Response viewRecord(@PathVariable("type") String type,
-                               @PathVariable("tag") String tag,
-                               HttpSession session,
-                               HttpServletRequest request,
-                               HttpServletResponse response) {
-        int code;
-        String message;
+
+    int verifyingLogin(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
-            code = -1;
-            message = "未登录";
-            return new Response(code, message, null);
-        }
+        if (cookies == null) return -1;
         List<Cookie> userIdCookies = Arrays.stream(cookies)
                 .filter(cookie -> cookie.getName().equals("user_id"))
                 .toList();
-        if (userIdCookies.isEmpty()) {
-            code = -1;
-            message = "未登录";
-            return new Response(code, message, null);
-        }
-        int user_id = Integer.parseInt(userIdCookies.get(0).getValue());
-        if (tag.equals("all")) {
-            switch (type) {
-                case "all" -> {
-                    code = 0;
-                    message = "查询成功";
-                    List<IERecord> data = recordService.getRecordByUserid(user_id);
-                    return new Response(code, message, data);
-                }
-                case "income" -> {
-                    code = 0;
-                    message = "查询成功";
-                    List<IERecord> data = recordService.getRecordByUserid(user_id).stream()
-                            .filter(IERecord::isIncome)
-                            .toList();
-                    return new Response(code, message, data);
-                }
-                case "expenditure" -> {
-                    code = 0;
-                    message = "查询成功";
-                    List<IERecord> data = recordService.getRecordByUserid(user_id).stream()
-                            .filter(record -> !record.isIncome())
-                            .toList();
-                    return new Response(code, message, data);
-                }
-                default -> {
-                    code = -2;
-                    message = "type 错误";
-                    return new Response(code, message, null);
-
-                }
-            }
-        } else {
-            int itag = Integer.parseInt(tag);
-            switch (type) {
-                case "all" -> {
-                    code = 0;
-                    message = "查询成功";
-                    List<IERecord> data = recordService.getRecordByUseridDivideByTag(user_id, itag);
-                    return new Response(code, message, data);
-                }
-                case "income" -> {
-                    code = 0;
-                    message = "查询成功";
-                    List<IERecord> data = recordService.getRecordByUseridDivideByTag(user_id, itag)
-                            .stream()
-                            .filter(IERecord::isIncome)
-                            .toList();
-                    return new Response(code, message, data);
-                }
-                case "expenditure" -> {
-                    code = 0;
-                    message = "查询成功";
-                    List<IERecord> data = recordService.getRecordByUseridDivideByTag(user_id, itag)
-                            .stream()
-                            .filter(record -> !record.isIncome())
-                            .toList();
-                    return new Response(code, message, data);
-                }
-                default -> {
-                    code = -2;
-                    message = "type 错误";
-                    return new Response(code, message, null);
-                }
-            }
-        }
-    }*/
+        if (userIdCookies.isEmpty()) return -1;
+        return Integer.parseInt(userIdCookies.get(0).getValue());
+    }
 }
