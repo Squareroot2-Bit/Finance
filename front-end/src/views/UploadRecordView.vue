@@ -28,25 +28,17 @@
     <el-form-item>
       <el-button type="primary" style="width: 100%; margin-top: 20px;" @click="submitForm(recordFormRef)">提交</el-button>
     </el-form-item>
-
+    
   </el-form>
 </template>
 <script setup lang="ts">
 import { reactive, ref} from 'vue'
 import { ElMessage, type FormInstance } from 'element-plus'
 import type { Record } from '@/types/record';
+import { RecordTag, formatDate} from '@/types/record'
 import {record} from '@/http/api'
-const RecordTag = [
-    "无",
-    "穿着",
-    "饮食",
-    "交通",
-    "住宿",
-    "娱乐",
-    "医疗",
-    "缴费",
-    "其他"
-]
+
+ 
 const rules = reactive({
   date: [
     { required: true, message: '请选择日期', trigger: 'blur' },
@@ -76,9 +68,7 @@ const rules = reactive({
   }
   ],
 })
-const formatDate = (date: Date) => {
-    return date.toISOString().slice(0, 10).replace(/-/g, '');
-}
+
 const formatUploadDate = (date: Date) => {
   if(date){recordForm.date = formatDate(date)}
 }
@@ -92,19 +82,23 @@ const recordForm = reactive<Record>({
   tag:0,
   remark: '',
 })
+const emit = defineEmits(['upload-success'])
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
 
       recordForm.money*=100
-      console.log(recordForm)
+      const date = new Date(recordForm.date)
+      // console.log(recordForm)
       record(recordForm).then(res => {
-        console.log(res)
+        console.log(recordForm.date)
+        emit('upload-success', date)
         ElMessage.success('新增记录成功')
       }).catch(err => {
         console.log(err)
       })
+      
       recordFormRef.value?.resetFields()
       
 

@@ -1,3 +1,4 @@
+
 import $http from './http_index'
 import type {Record} from '@/types/record'
 interface LoginFormStr {
@@ -13,3 +14,5 @@ export const logout = () =>
   })
 export const register = (data: LoginFormStr) => $http({ url: '/register', method: 'post', data })
 export const record  = (data: Record) => $http({ url: '/record', method: 'post', data })
+export const record_view = (RecordURL:string) => $http({ url: RecordURL, method: 'get' })
+export const record_del = (data: any) => $http({ url: '/record/delete', method: 'post', data })

@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach } from 'vitest'
 import $http from '@/http/http_index'
 
 import MockAdapter from 'axios-mock-adapter'
-import { login, logout, register, record } from '@/http/api'
+import { login, logout, register, record ,record_view,record_del} from '@/http/api'
 
 const mock = new MockAdapter($http)
 
@@ -97,5 +97,19 @@ describe('API Functions', () => {
     } catch (error) {
       expect(error).toEqual('提交记录失败')
     }
+  })
+
+  it('查看记录成功', async () => {
+    mock.onGet('/record/view').reply(200, { code: 0, message: '查看记录成功', data: {records: [{id: 1, date: '20240710', money: 10, tag: 1, remark: ''}]}})
+    const response = await record_view("/record/view/0/0/20200710/20240712")
+    expect(response.data.records[0].id).toEqual(1)
+  })
+
+
+  it('删除记录成功', async () => {
+  mock.onPost('/record/delete').reply(200, { code: 0, message: '删除记录成功', data: null })
+  const recordData = {record_id: 1}
+  const response = await record_del(recordData)
+  expect(response.data).toEqual(null)
   })
 })
