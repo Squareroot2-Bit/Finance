@@ -71,10 +71,11 @@ export default defineComponent({
           console.log(data.loginForm)
           login(data.loginForm).then((res) => {
             console.log(res)
+            localStorage.setItem('user_id', res.data.user_id)
             localStorage.setItem('token', data.loginForm.username)
             router.push('/home')
           })
-          // localStorage.setItem('token', data.loginForm.userName)
+          // localStorage.setItem('token', data.loginForm.username)
           // router.push('/home')
         } else {
           console.log('error submit!', fields)

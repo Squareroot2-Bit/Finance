@@ -1,10 +1,12 @@
 package com.lwjandlyw.personalfinance.mapper;
 
 import com.lwjandlyw.personalfinance.pojo.IERecord;
-import com.lwjandlyw.personalfinance.pojo.User;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -20,14 +22,24 @@ public interface IERecordMapper {
             from record
             where record_id = #{record_id}
             """)
-    List<IERecord> selectUserByRecordid(int record_id);
+    List<IERecord> selectRecordsByRecordid(int record_id);
 
     @Select("""
             select record_id, income, user_id, money, "date", tag, remark
             from record
             where user_id = #{user_id}
+            and date("date") >= date(#{startDate})
+            and date("date") <= date(#{endDate})
             """)
-    List<IERecord> selectUserByUserid(int user_id);
+    List<IERecord> selectRecordsByUserid(
+            int user_id, LocalDate startDate, LocalDate endDate);
 
     int insert(IERecord record);
+
+    @Delete("""
+            delete
+            from record
+            where record_id = #{record_id}
+            """)
+    int delete(int record_id);
 }

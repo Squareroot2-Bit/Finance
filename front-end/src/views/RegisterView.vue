@@ -53,7 +53,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         username: registerForm.username,
         password: registerForm.password
       }
-      console.log(loginFormData)
+      // console.log(loginFormData)
       register(loginFormData).then((res) => {
         console.log(res)
         ElMessage.success('注册成功，欢迎加入我们')

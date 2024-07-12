@@ -4,7 +4,10 @@ enum JSON_STATUS {
   '成功' = 0,
   '用户不存在' = -1,
   '密码错误' = -2,
-  '目标用户名已存在' = -3
+  '目标用户名已存在' = -3,
+  '添加失败' = -4,
+  '查询失败'=-5,
+  '删除失败' = -6,
 }
 
 const getCurrentUrl = () => {
@@ -15,17 +18,17 @@ const $http = axios.create({
   timeout: 2000,
   baseURL: 'http://localhost:8080',
   headers: {
-    'Content-Type': 'application/json;charset=UTF-8'
-    // Authorization: 'Bearer ' + localStorage.getItem('token') || ''
+    'Content-Type': 'application/json;charset=UTF-8',
+    'user_id': localStorage.getItem('user_id') || ''
   }
 })
 
 $http.interceptors.request.use(
   (config) => {
     config.headers = config.headers || {}
-    // if (localStorage.getItem('token')) {
-    //   config.headers.token = localStorage.getItem('token') || ''
-    // }
+    if (localStorage.getItem('user_id')) {
+      config.headers.user_id = localStorage.getItem('user_id') || ''
+    }
     return config
   },
   (error) => {
