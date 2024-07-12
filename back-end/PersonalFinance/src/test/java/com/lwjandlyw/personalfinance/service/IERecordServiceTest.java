@@ -65,7 +65,7 @@ class IERecordServiceTest {
         List<IERecord> recordsBeforeInsert =
                 service.getRecordByUserid(user_id, tag, startDate, endDate);
         int insert = service.insert(recordBody, user_id);
-        assert insert == 1;
+        assert insert != 0;
         List<IERecord> recordsAfterInsert =
                 service.getRecordByUserid(user_id, tag, startDate, endDate);
         assert recordsAfterInsert.size() == recordsBeforeInsert.size() + 1;

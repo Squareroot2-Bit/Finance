@@ -1,6 +1,7 @@
 package com.lwjandlyw.personalfinance.controller;
 
 import com.lwjandlyw.personalfinance.body.IERecordBody;
+import com.lwjandlyw.personalfinance.body.IERecordListBody;
 import com.lwjandlyw.personalfinance.body.IntegerBody;
 import com.lwjandlyw.personalfinance.body.UserBody;
 import com.lwjandlyw.personalfinance.pojo.IERecord;
@@ -231,6 +232,41 @@ public class MainController {
         code = 0;
         message = "查询成功";
         return new Response(code, message, summaryDataList);
+    }
+
+    @PostMapping("/input")
+    public Response input(@RequestBody IERecordListBody recordListBody,
+                          HttpSession session,
+                          HttpServletRequest request,
+                          HttpServletResponse response) {
+        int code;
+        String message;
+        int user_id = verifyingLogin(request);
+        if (user_id < 0) {
+            code = -1;
+            message = "未登录";
+            return new Response(code, message, null);
+        }
+        List<IERecordBody> recordBodyList = recordListBody.getRecordBodyList();
+        List<Integer> recordidList = new ArrayList<>();
+        boolean success = true;
+        for (IERecordBody recordBody : recordBodyList) {
+            int insert = recordService.insert(recordBody, user_id);
+            recordidList.add(insert);
+            if (insert <= 0) {
+                success = false;
+                break;
+            }
+        }
+        if (success) {
+            code = 0;
+            message = "共" + recordBodyList.size() + "条数据导入成功";
+        } else {
+            recordidList.forEach(record_id -> recordService.delete(record_id));
+            code = -2;
+            message = "数据导入失败";
+        }
+        return new Response(code, message, null);
     }
 
     int verifyingLogin(HttpServletRequest request) {
