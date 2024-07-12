@@ -4,7 +4,10 @@ enum JSON_STATUS {
   '成功' = 0,
   '用户不存在' = -1,
   '密码错误' = -2,
-  '目标用户名已存在' = -3
+  '目标用户名已存在' = -3,
+  '添加失败' = -4,
+  '查询失败'=-5,
+  '删除失败' = -6,
 }
 
 const getCurrentUrl = () => {
@@ -23,9 +26,9 @@ const $http = axios.create({
 $http.interceptors.request.use(
   (config) => {
     config.headers = config.headers || {}
-    // if (localStorage.getItem('user_id')) {
-    //   config.headers.user_id = localStorage.getItem('user_id') || ''
-    // }
+    if (localStorage.getItem('user_id')) {
+      config.headers.user_id = localStorage.getItem('user_id') || ''
+    }
     return config
   },
   (error) => {

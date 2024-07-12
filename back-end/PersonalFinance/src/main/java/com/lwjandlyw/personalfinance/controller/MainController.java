@@ -173,9 +173,9 @@ public class MainController {
     int verifyingLogin(HttpServletRequest request) {
         // 未登录返回-1
         int user_id = -1;
-        if (Collections.list(request.getHeaderNames()).contains("user-id")) {
+        if (Collections.list(request.getHeaderNames()).contains("user_id")) {
             try {
-                user_id = request.getIntHeader("user-id");
+                user_id = request.getIntHeader("user_id");
             } catch (NumberFormatException ignore) {
             }
         }
