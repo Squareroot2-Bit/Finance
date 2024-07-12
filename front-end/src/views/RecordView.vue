@@ -27,6 +27,9 @@
   <el-form-item style="width: 200px;">
     <el-button type="primary" @click="handleSearch" style="width: 100%;">搜索</el-button>
   </el-form-item>
+  <el-form-item>
+    <el-button type="primary" @click="convertRecordToFile" style="width: 100%;">导出</el-button>
+  </el-form-item>
 </el-form>
 
   </div>
@@ -47,7 +50,7 @@
       <template #default="scope">
         <el-button link type="danger" size="small" @click="handleDelete(scope.row)">删除</el-button>
       </template>
-        
+    
     </el-table-column>
   </el-table>
   </div>
@@ -63,12 +66,12 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch } from 'vue';
-import { RecordTag, formatDate } from '@/types/record';
+import { RecordTag, formatDate, convertToRecordArray} from '@/types/record';
 import UploadRecordView from './UploadRecordView.vue';
 import { record_view, record_del, record } from '@/http/api';
-import type { record_response } from '@/types/record';
+import type { record_response,output_Record } from '@/types/record';
 import type { TableColumnCtx } from 'element-plus';
-
+import Papa from 'papaparse';
 interface view_options {
   income: number;
   tag: number;
@@ -148,6 +151,19 @@ onMounted(() => {
     tableData.value = JSON.parse(savedData);
   }
 });
+
+const convertRecordToFile= ()=> {
+  const data = convertToRecordArray(tableData.value);
+  const csv = Papa.unparse(data);
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `record_${startDateString}_${endDateString}.csv`;
+  document.body.appendChild(link);
+  link.click();
+
+document.body.removeChild(link);
+}
 </script>
 
 

@@ -6,7 +6,7 @@
     class="demo-ruleForm"
     :rules="rules"
     status-icon
-    style="height: 100%;;"
+    style="height: 50%;"
   >
   <h2>新增记录</h2>
     <el-form-item label="日期" prop="date">
@@ -28,17 +28,40 @@
     <el-form-item>
       <el-button type="primary" style="width: 100%; margin-top: 20px;" @click="submitForm(recordFormRef)">提交</el-button>
     </el-form-item>
-    
   </el-form>
+  <el-upload
+    class="upload-demo"
+    drag
+    action="#"
+    :show-file-list="false"
+    :http-request="handleRequest"
+    :file-list="fileList"
+    :accept="'.csv'"
+    :multiple="false"
+  >
+    <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+    <div class="el-upload__text">
+      Drop file here or <em>click to upload</em>
+    </div>
+    <template #tip>
+      <div class="el-upload__tip">
+        只接受符合格式的.csv
+      </div>
+    </template>
+  </el-upload>
 </template>
 <script setup lang="ts">
 import { reactive, ref} from 'vue'
-import { ElMessage, type FormInstance } from 'element-plus'
+import { ElMessage, type FormInstance, type UploadRequestOptions } from 'element-plus'
 import type { Record } from '@/types/record';
-import { RecordTag, formatDate} from '@/types/record'
-import {record} from '@/http/api'
+import { RecordTag, formatDate, convertToUploadeRecordArray} from '@/types/record'
+import {record,records_upload} from '@/http/api'
+import { UploadFilled } from '@element-plus/icons-vue'
+import type { UploadUserFile } from 'element-plus'
+import Papa from 'papaparse';
 
- 
+
+
 const rules = reactive({
   date: [
     { required: true, message: '请选择日期', trigger: 'blur' },
@@ -107,6 +130,71 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     }
   })
 }
+const validateHeaders = (headers: string[]) => {
+  const requiredHeaders = ['money', 'date', 'tag', 'remark'];
+  const missingHeaders = requiredHeaders.filter(header => !headers.includes(header));
+  if (missingHeaders.length > 0) {
+    throw new Error(`Missing required headers: ${missingHeaders.join(', ')}`);
+  }
+};
+
+const fileList = ref<UploadUserFile[]>([])
+  // const handleChange: UploadProps['onChange'] = (uploadFile) => {
+  //   console.log("-----")
+  //   const reader= new FileReader()
+  //   reader.onload = (e) => {
+  //   const csvData = (e.target as FileReader).result as string;
+  //   Papa.parse(csvData, {
+  //     header: true,
+  //     dynamicTyping: true,
+  //     complete: (result) => {
+  //       const headers = result.meta.fields;
+  //       if (!headers) {
+  //         throw new Error("CSV file missing headers");
+  //       }
+  //       try {
+  //         validateHeaders(headers);
+  //         const jsonData = convertToUploadeRecordArray(result.data);
+
+  //         console.log("Valid JSON data:", jsonData);
+  //       } catch (error) {
+  //         console.error("Validation error:", error);
+  //       }}})
+  // };
+  // if (uploadFile.raw) {
+  //   reader.readAsText(uploadFile.raw);
+  // }
+  //   }
+  const handleRequest = async (options: UploadRequestOptions) => {
+  const { file } = options;
+  
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const csvData = (e.target as FileReader).result as string;
+      Papa.parse(csvData, {
+      header: true,
+      dynamicTyping: true,
+      complete: (result) => {
+        const headers = result.meta.fields;  
+        try {
+          if (!headers) {throw new Error("CSV file missing headers");}
+           validateHeaders(headers);
+          const jsonData = convertToUploadeRecordArray(result.data);
+          records_upload({recordBodyList:jsonData}).then(res => {
+            console.log(res)
+            ElMessage.success('上传成功')
+          }).catch(err => {
+            console.log(err)
+            // ElMessage.error('上传失败')
+          })
+          console.log("Valid JSON data:", jsonData);
+        } catch (error) {
+          ElMessage.error("文件格式错误!");
+          console.error("Validation error:", error);
+        }}})
+  };
+  reader.readAsText(file);
+};
 </script>
 <style lang="scss" scoped>
 .el-form-item {
