@@ -49,7 +49,7 @@ public class IERecordService {
         record.setDate(LocalDate.parse(recordBody.getDate(), Formatter));
         record.setMoney(recordBody.getMoney());
         record.setTag(recordBody.getTag());
-        record.setRemark(recordBody.getRemark());
+        record.setRemark(recordBody.getRemark() == null ? "" : recordBody.getRemark());
         int insert = 0;
         try {
             insert = recordMapper.insert(record);
