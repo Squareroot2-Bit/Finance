@@ -101,10 +101,17 @@ describe('API Functions', () => {
 
   it('查看记录成功', async () => {
     mock.onGet('/record/view').reply(200, { code: 0, message: '查看记录成功', data: {records: [{id: 1, date: '20240710', money: 10, tag: 1, remark: ''}]}})
-    const response = await record_view("/record/view/0/0/20200710/20240712")
+    const response = await record_view("/record/view")
     expect(response.data.records[0].id).toEqual(1)
   })
-
+  it('查看记录失败', async () => {
+    mock.onGet('/record/view').reply(200, { code: -6, message: '查看记录失败', data: null })
+    try {
+      await record_view("/record/view")
+    } catch (error) {
+      expect(error).toEqual('查看记录失败')
+    }
+  })
 
   it('删除记录成功', async () => {
   mock.onPost('/record/delete').reply(200, { code: 0, message: '删除记录成功', data: null })
@@ -112,4 +119,13 @@ describe('API Functions', () => {
   const response = await record_del(recordData)
   expect(response.data).toEqual(null)
   })
+})
+ it('删除记录失败', async () => {
+  mock.onPost('/record/delete').reply(200, { code: -7, message: '删除记录失败', data: null })
+  const recordData = {record_id: 1}
+  try {
+    await record_del(recordData)
+  } catch (error) {
+    expect(error).toEqual('删除记录失败')
+  }
 })
