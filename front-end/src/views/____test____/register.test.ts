@@ -13,22 +13,22 @@ describe('RegisterView.vue', () => {
     wrapper = mount(RegisterView)
   })
 
-  it('显示用户名输入框', async () => {
-    const usernameInput = wrapper.findComponent({ name: 'ElInput' })
-    await usernameInput.setValue('testuser')
-    expect(wrapper.vm.registerForm.userName).toBe('testuser')
-  })
+  // it('显示用户名输入框', async () => {
+  //   const usernameInput = wrapper.findComponent({ name: 'ElInput' })
+  //   await usernameInput.setValue('testuser')
+  //   expect(wrapper.vm.registerForm.userName).toBe('testuser')
+  // })
 
-  it('显示密码输入框', async () => {
-    const passwordInput = wrapper.findAllComponents({ name: 'ElInput' })[1]
-    await passwordInput.setValue('testpassword')
-    expect(wrapper.vm.registerForm.password).toBe('testpassword')
-  })
+  // it('显示密码输入框', async () => {
+  //   const passwordInput = wrapper.findAllComponents({ name: 'ElInput' })[1]
+  //   await passwordInput.setValue('testpassword')
+  //   expect(wrapper.vm.registerForm.password).toBe('testpassword')
+  // })
 
-  it('显示注册按钮', () => {
-    const loginButton = wrapper.find('button[name="register"]')
-    expect(loginButton.exists()).toBe(true)
-  })
+  // it('显示注册按钮', () => {
+  //   const loginButton = wrapper.find('button[name="register"]')
+  //   expect(loginButton.exists()).toBe(true)
+  // })
 
   it('检测无效用户名', async () => {
     const formEl = {

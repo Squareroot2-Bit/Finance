@@ -146,6 +146,7 @@ const handleSearch = () => {
 };
 
 onMounted(() => {
+  handleSearch();
   const savedData = localStorage.getItem('tableData');
   if (savedData) {
     tableData.value = JSON.parse(savedData);
