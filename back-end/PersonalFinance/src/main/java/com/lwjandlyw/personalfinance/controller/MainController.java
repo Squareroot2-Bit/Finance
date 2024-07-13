@@ -5,6 +5,7 @@ import com.lwjandlyw.personalfinance.body.IERecordListBody;
 import com.lwjandlyw.personalfinance.body.IntegerBody;
 import com.lwjandlyw.personalfinance.body.UserBody;
 import com.lwjandlyw.personalfinance.pojo.IERecord;
+import com.lwjandlyw.personalfinance.pojo.data.Expense;
 import com.lwjandlyw.personalfinance.pojo.data.SummaryData;
 import com.lwjandlyw.personalfinance.response.Response;
 import com.lwjandlyw.personalfinance.service.IERecordService;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -195,43 +197,43 @@ public class MainController {
         LocalDate endDate = LocalDate.parse(endDateStr, FORMATTER);
         List<IERecord> recordList =
                 recordService.getRecordByUserid(user_id, 0, startDate, endDate);
-        ArrayList<SummaryData> summaryDataList =
-                new ArrayList<>(Collections.nCopies(9, null));
-        for (int tag = 0; tag <= MAX_TAG; tag++) {
-            AtomicLong incomeAtomic = new AtomicLong(0);
-            AtomicLong expenditureAtomic = new AtomicLong(0);
-            long income, expenditure, incomeRate, expenditureRate;
-            if (tag == 0) {
-                recordList.stream()
-                        .map(IERecord::getMoney)
-                        .forEach(money -> {
-                            if (money > 0) incomeAtomic.addAndGet(money);
-                            else expenditureAtomic.addAndGet(money);
-                        });
-                income = incomeAtomic.get();
-                expenditure = expenditureAtomic.get();
-                incomeRate = expenditureRate = 10000;
-
-            } else {
-                final int finalTag = tag;
-                recordList.stream()
-                        .filter(record -> finalTag == record.getTag())
-                        .map(IERecord::getMoney)
-                        .forEach(money -> {
-                            if (money > 0) incomeAtomic.addAndGet(money);
-                            else expenditureAtomic.addAndGet(money);
-                        });
-                income = incomeAtomic.get();
-                expenditure = expenditureAtomic.get();
-                incomeRate = income * 10000 / summaryDataList.get(0).getIncome();
-                expenditureRate = expenditure * 10000 / summaryDataList.get(0).getExpenditure();
-            }
-            SummaryData summaryData = new SummaryData(tag, income, expenditure, incomeRate, expenditureRate);
-            summaryDataList.set(tag, summaryData);
+        List<Long> income = new ArrayList<>();
+        List<Long> expense = new ArrayList<>();
+        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            LocalDate finalDate = date;
+            long incomeDay = recordList.stream()
+                    .filter(IERecord::isIncome)
+                    .filter(record -> record.getDate().isEqual(finalDate))
+                    .map(IERecord::getMoney)
+                    .reduce(Long::sum)
+                    .orElse(0L);
+            income.add(incomeDay);
+            long expenseDay = recordList.stream()
+                    .filter(record -> !record.isIncome())
+                    .filter(record -> record.getDate().isEqual(finalDate))
+                    .map(record -> -record.getMoney())
+                    .reduce(Long::sum)
+                    .orElse(0L);
+            expense.add(expenseDay);
+        }
+        long incomeSum = income.stream().reduce(Long::sum).orElse(0L);
+        long expenseSum = expense.stream().reduce(Long::sum).orElse(0L);
+        List<Expense> expensePieChart = new ArrayList<>();
+        for (int tag = 2; tag < MAX_TAG; tag++) {
+            int finalTag = tag;
+            long value = recordList.stream()
+                    .filter(record -> !record.isIncome())
+                    .filter(record -> record.getTag() == finalTag)
+                    .map(record -> -record.getMoney())
+                    .reduce(Long::sum)
+                    .orElse(0L);
+            if (value > 0) expensePieChart.add(new Expense(value, tag));
         }
         code = 0;
         message = "查询成功";
-        return new Response(code, message, summaryDataList);
+        SummaryData data = new SummaryData(
+                income, expense, incomeSum, expenseSum, expensePieChart);
+        return new Response(code, message, data);
     }
 
     @PostMapping("/input")
