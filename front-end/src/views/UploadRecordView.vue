@@ -93,7 +93,9 @@ const rules = reactive({
 })
 
 const formatUploadDate = (date: Date) => {
-  if(date){recordForm.date = formatDate(date)}
+  if(date){
+    // console.log(date.toISOString())
+    recordForm.date = formatDate(date)}
 }
 const disabledDate = (date: Date) => {
   return date.getTime()> Date.now()

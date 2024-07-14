@@ -24,7 +24,8 @@ export const RecordTag = [
 ]
 
 export const formatDate = (date: Date) => {
-    return date.toISOString().slice(0, 10).replace(/-/g, '');
+    const adjustedDate = new Date(date.getTime() + 8 * 60 * 60 * 1000);
+    return adjustedDate.toISOString().slice(0, 10).replace(/-/g, '');
 }
 
 export interface record_response 
