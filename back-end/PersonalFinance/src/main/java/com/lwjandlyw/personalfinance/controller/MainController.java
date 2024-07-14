@@ -120,19 +120,24 @@ public class MainController {
             return new Response(code, message, null);
         }
         Integer record_id = integerBody.getRecord_id();
-        IERecord record = recordService.getRecordByRecordid(record_id);
-        if (record != null && record.getUser_id() == user_id) {
-            int delete = recordService.delete(record_id);
-            if (delete == 1) {
+        int delete = recordService.delete(record_id, user_id);
+        switch (delete) {
+            case 0 -> {
                 code = 0;
                 message = "删除成功";
-            } else {
+            }
+            case -2 -> {
                 code = -2;
                 message = "删除失败";
             }
-        } else {
-            code = -3;
-            message = "无权限删除";
+            case -3 -> {
+                code = -3;
+                message = "无权限删除";
+            }
+            default -> {
+                code = delete;
+                message = "未知错误";
+            }
         }
         return new Response(code, message, null);
     }
@@ -191,44 +196,9 @@ public class MainController {
         }
         LocalDate startDate = LocalDate.parse(startDateStr, FORMATTER);
         LocalDate endDate = LocalDate.parse(endDateStr, FORMATTER);
-        List<IERecord> recordList =
-                recordService.getRecordByUserid(user_id, 0, startDate, endDate);
-        List<Long> income = new ArrayList<>();
-        List<Long> expense = new ArrayList<>();
-        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-            LocalDate finalDate = date;
-            long incomeDay = recordList.stream()
-                    .filter(IERecord::isIncome)
-                    .filter(record -> record.getDate().isEqual(finalDate))
-                    .map(IERecord::getMoney)
-                    .reduce(Long::sum)
-                    .orElse(0L);
-            income.add(incomeDay);
-            long expenseDay = recordList.stream()
-                    .filter(record -> !record.isIncome())
-                    .filter(record -> record.getDate().isEqual(finalDate))
-                    .map(record -> -record.getMoney())
-                    .reduce(Long::sum)
-                    .orElse(0L);
-            expense.add(expenseDay);
-        }
-        long incomeSum = income.stream().reduce(Long::sum).orElse(0L);
-        long expenseSum = expense.stream().reduce(Long::sum).orElse(0L);
-        List<Expense> expensePieChart = new ArrayList<>();
-        for (int tag = 2; tag < MAX_TAG; tag++) {
-            int finalTag = tag;
-            long value = recordList.stream()
-                    .filter(record -> !record.isIncome())
-                    .filter(record -> record.getTag() == finalTag)
-                    .map(record -> -record.getMoney())
-                    .reduce(Long::sum)
-                    .orElse(0L);
-            if (value > 0) expensePieChart.add(new Expense(value, tag));
-        }
         code = 0;
         message = "查询成功";
-        SummaryData data = new SummaryData(
-                income, expense, incomeSum, expenseSum, expensePieChart);
+        SummaryData data = recordService.summary(startDate, endDate, user_id);
         return new Response(code, message, data);
     }
 
@@ -246,25 +216,46 @@ public class MainController {
             return new Response(code, message, null);
         }
         List<IERecordBody> recordBodyList = recordListBody.getRecordBodyList();
-        List<Integer> recordidList = new ArrayList<>();
-        boolean success = true;
-        for (IERecordBody recordBody : recordBodyList) {
-            int insert = recordService.insert(recordBody, user_id);
-            recordidList.add(insert);
-            if (insert <= 0) {
-                success = false;
-                break;
-            }
-        }
-        if (success) {
+        int input = recordService.input(recordBodyList, user_id);
+        if (input > 0) {
             code = 0;
-            message = "共" + recordBodyList.size() + "条数据导入成功";
+            message = "共" + input + "条数据导入成功";
         } else {
-            recordidList.forEach(record_id -> recordService.delete(record_id));
             code = -2;
             message = "数据导入失败";
         }
         return new Response(code, message, null);
+    }
+
+    @GetMapping("/output/{type}/{tag}/{start-date}/{end-date}")
+    public Response output(@PathVariable("type") Integer type,
+                           @PathVariable("tag") Integer tag,
+                           @PathVariable("start-date") String startDateStr,
+                           @PathVariable("end-date") String endDateStr,
+                           HttpSession session,
+                           HttpServletRequest request,
+                           HttpServletResponse response) {
+        int code;
+        String message;
+        int user_id = verifyingLogin(request);
+        if (user_id < 0) {
+            code = -1;
+            message = "未登录";
+            return new Response(code, message, null);
+        }
+        LocalDate startDate = LocalDate.parse(startDateStr, FORMATTER);
+        LocalDate endDate = LocalDate.parse(endDateStr, FORMATTER);
+        List<IERecord> output = recordService.output(user_id, type, tag, startDate, endDate);
+        if (output != null) {
+            code = 0;
+            message = "共" + output.size() + "条数据导出成功";
+            Object data = output;
+            return new Response(code, message, data);
+        } else {
+            code = -2;
+            message = "导出失败";
+            return new Response(code, message, null);
+        }
     }
 
     int verifyingLogin(HttpServletRequest request) {
