@@ -37,7 +37,7 @@ public class IERecordService {
         else return null;
     }
 
-    public List<IERecord> getRecordByUserid(
+    public List<IERecord> getRecordsByUserid(
             int user_id, int tag, LocalDate startDate, LocalDate endDate) {
         List<IERecord> RecordsByUserid = recordMapper
                 .selectRecordsByUserid(user_id, startDate, endDate);

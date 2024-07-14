@@ -5,7 +5,6 @@ import com.lwjandlyw.personalfinance.body.IERecordListBody;
 import com.lwjandlyw.personalfinance.body.IntegerBody;
 import com.lwjandlyw.personalfinance.body.UserBody;
 import com.lwjandlyw.personalfinance.pojo.IERecord;
-import com.lwjandlyw.personalfinance.pojo.data.Expense;
 import com.lwjandlyw.personalfinance.pojo.data.SummaryData;
 import com.lwjandlyw.personalfinance.response.Response;
 import com.lwjandlyw.personalfinance.service.IERecordService;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -163,7 +161,7 @@ public class MainController {
             LocalDate startDate = LocalDate.parse(startDateStr, FORMATTER);
             LocalDate endDate = LocalDate.parse(endDateStr, FORMATTER);
             List<IERecord> temp =
-                    recordService.getRecordByUserid(user_id, tag, startDate, endDate);
+                    recordService.getRecordsByUserid(user_id, tag, startDate, endDate);
             code = 0;
             message = "查询成功";
             List<IERecord> data = switch (type) {
