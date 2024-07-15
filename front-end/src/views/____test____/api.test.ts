@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach } from 'vitest'
 import $http from '@/http/http_index'
 
 import MockAdapter from 'axios-mock-adapter'
-import { login, logout, register, record ,record_view,record_del, records_upload} from '@/http/api'
+import { login, logout, register, record ,record_view,record_del, records_upload, } from '@/http/api'
 
 const mock = new MockAdapter($http)
 
