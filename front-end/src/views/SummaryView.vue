@@ -38,44 +38,7 @@
 </template> -->
 
 <script setup lang="ts">
-// import * as echarts from 'echarts/core';
-// import { use } from 'echarts/core'
-// import { LineChart,PieChart  } from 'echarts/charts'
-// import {
-//   TitleComponent,
-//   TooltipComponent,
-//   LegendComponent,
-//   ToolboxComponent,
-//   GridComponent
-// } from 'echarts/components'
-// import { CanvasRenderer } from 'echarts/renderers'
-// import type { ComposeOption } from 'echarts/core'
-// import type { LineSeriesOption,PieSeriesOption } from 'echarts/charts'
-// import type {
-//   TitleComponentOption,
-//   TooltipComponentOption,
-//   LegendComponentOption,
-//   ToolboxComponentOption,
-//   GridComponentOption
-// } from 'echarts/components'
-// use([
-//   TitleComponent,
-//   TooltipComponent,
-//   LegendComponent,
-//   ToolboxComponent,
-//   GridComponent,
-//   LineChart,
-//   PieChart,
-//   CanvasRenderer
-// ])
-// type EChartsOption = ComposeOption<
-//   | TitleComponentOption
-//   | TooltipComponentOption
-//   | LegendComponentOption
-//   | ToolboxComponentOption
-//   | GridComponentOption
-//   | LineSeriesOption
-// >
+
 import { onMounted, ref } from 'vue'
 import {formatDate}from '@/types/record'
 import {record_view}from'@/http/api'
@@ -92,10 +55,11 @@ import {
   LegendComponent,
   type LegendComponentOption
 } from 'echarts/components';
-import { LineChart, type LineSeriesOption } from 'echarts/charts';
-import { UniversalTransition } from 'echarts/features';
+import { LineChart, type LineSeriesOption,PieChart, type PieSeriesOption } from 'echarts/charts';
+import { UniversalTransition,LabelLayout } from 'echarts/features';
 import { CanvasRenderer } from 'echarts/renderers';
 
+import {generateDaysArray,generatePieData, type pieOut} from '@/types/summary'
 echarts.use([
   TitleComponent,
   ToolboxComponent,
@@ -104,7 +68,9 @@ echarts.use([
   LegendComponent,
   LineChart,
   CanvasRenderer,
-  UniversalTransition
+  UniversalTransition,
+  PieChart,
+  LabelLayout
 ]);
 
 type EChartsOption1 = echarts.ComposeOption<
@@ -115,90 +81,130 @@ type EChartsOption1 = echarts.ComposeOption<
   | LegendComponentOption
   | LineSeriesOption
 >;
+type EChartsOption2 = echarts.ComposeOption<
+  | TitleComponentOption
+  | TooltipComponentOption
+  | LegendComponentOption
+  | PieSeriesOption
+>;
+const income_line= ref<number[]>([]);
+const expense_line = ref<number[]>([]);
+const date_range = ref<string[]>([]);
+const pieData = ref<pieOut[]>([]);
 
-// var chartDom = document.getElementById('chart')!;
-// var myChart = echarts.init(chartDom);
-var option: EChartsOption1;
+const updateChart =()=>{
+  var option: EChartsOption1;
+  var option2 : EChartsOption2;
+  const lineChart = echarts.init(document.getElementById('chart1')!);
+  const pieChart = echarts.init(document.getElementById('chart2')!);
+
 
 option = {
-  title: {
-    text: 'Stacked Line'
+ "title": {
+    "text": "月度收支趋势图"
   },
-  tooltip: {
-    trigger: 'axis'
+  "tooltip": {
+    "trigger": "axis"
   },
-  legend: {
-    data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']
+  "legend": {
+    "data": ["收入", "支出"]
   },
-  grid: {
-    left: '3%',
-    right: '4%',
-    bottom: '3%',
-    containLabel: true
+  "grid": {
+    "left": "3%",
+    "right": "4%",
+    "bottom": "3%",
+    "containLabel": true
   },
-  toolbox: {
-    feature: {
-      saveAsImage: {}
+  "toolbox": {
+    "feature": {
+      "saveAsImage": {}
     }
   },
-  xAxis: {
-    type: 'category',
-    boundaryGap: false,
-    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+  "xAxis": {
+    "type": "category",
+    "boundaryGap": false,
+    "data": date_range.value
   },
-  yAxis: {
-    type: 'value'
+  "yAxis": {
+    "type": "value"
   },
-  series: [
+  "series": [
     {
-      name: 'Email',
-      type: 'line',
-      stack: 'Total',
-      data: [120, 132, 101, 134, 90, 230, 210]
+      "name": "收入",
+      "type": "line",
+      "data": income_line.value,
+      "itemStyle": {
+        "color": "green"
+      },
+      "lineStyle": {
+        "color": "green"
+      }
     },
     {
-      name: 'Union Ads',
-      type: 'line',
-      stack: 'Total',
-      data: [220, 182, 191, 234, 290, 330, 310]
-    },
-    {
-      name: 'Video Ads',
-      type: 'line',
-      stack: 'Total',
-      data: [150, 232, 201, 154, 190, 330, 410]
-    },
-    {
-      name: 'Direct',
-      type: 'line',
-      stack: 'Total',
-      data: [320, 332, 301, 334, 390, 330, 320]
-    },
-    {
-      name: 'Search Engine',
-      type: 'line',
-      stack: 'Total',
-      data: [820, 932, 901, 934, 1290, 1330, 1320]
+      "name": "支出",
+      "type": "line",
+      "data":expense_line.value,
+      "itemStyle": {
+        "color": "red"
+      },
+      "lineStyle": {
+        "color": "red"
+      }
     }
   ]
 };
 
-// option && myChart.setOption(option);
-onMounted(() => {
-  const chartDom = document.getElementById('chart1')!;
-  const myChart = echarts.init(chartDom);
-  myChart.setOption(option);
-})
+option2 = {
+  title: {
+    text: '月度各项支出占比',
+    left: 'center'
+  },
+  tooltip: {
+    trigger: 'item',
+    formatter: '{a} <br/>{b}: {c} ({d}%)'
+  },
+  legend: {
+    orient: 'vertical',
+    left: 'left'
+  },
+  series: [
+    {
+      name: '支出',
+      type: 'pie',
+      radius: '50%',
+      data: pieData.value,
+      emphasis: {
+        itemStyle: {
+          shadowBlur: 10,
+          shadowOffsetX: 0,
+          shadowColor: 'rgba(0, 0, 0, 0.5)'
+        }
+      }
+    }
+  ]
+};
+console.log(option);
+lineChart.setOption(option);
+pieChart.setOption(option2);
+}
 
+// var lineChart : echarts.ECharts;
+// option && myChart.setOption(option);
+// onMounted(() => {
+//   updateChart();
+// })
 
 
 const disabledDate = (date: Date) => {
   return date.getTime() > Date.now()
 }
 const month = ref(new Date())
-const totalIncome = ref(10000);
-const totalExpense = ref(5000);
+const totalIncome = ref(0);
+const totalExpense = ref(0);
 const netValue = ref(totalIncome.value - totalExpense.value);
+
+
+
 const handleSearch = () => {
   const currentDate = month.value;
   // console.log(currentDate.toDateString());
@@ -211,6 +217,19 @@ const handleSearch = () => {
   record_view(url).then((res) => {
     const data = res.data;
     console.log(data);
+
+    income_line.value = data.income.map((value: number) => value / 100);
+    expense_line.value = data.expense.map((value: number) => value / 100);
+    totalIncome.value = (data.income_sum/100);
+    totalExpense.value = data.expense_sum/100;
+    netValue.value = totalIncome.value - totalExpense.value;
+    date_range.value = generateDaysArray(income_line.value.length);
+    pieData.value = generatePieData(data.expense_pie_chart);
+    updateChart();
+    // console.log(income_line.value);
+    // lineChart.setOption(option);
+    // console.log(option);
+    // pieChart.setOption(option2);
   })
 }
   
