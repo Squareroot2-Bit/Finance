@@ -4,10 +4,10 @@ import com.lwjandlyw.personalfinance.body.IERecordBody;
 import com.lwjandlyw.personalfinance.mapper.IERecordMapper;
 import com.lwjandlyw.personalfinance.pojo.IERecord;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -48,8 +48,14 @@ public class IERecordService {
         record.setDate(LocalDate.parse(recordBody.getDate(), Formatter));
         record.setMoney(recordBody.getMoney());
         record.setTag(recordBody.getTag());
-        record.setRemark(recordBody.getRemark());
-        return recordMapper.insert(record);
+        record.setRemark(recordBody.getRemark() == null ? "" : recordBody.getRemark());
+        int insert = 0;
+        try {
+            insert = recordMapper.insert(record);
+        } catch (UncategorizedSQLException ignore) {
+        }
+        if (insert == 0) return 0;
+        else return record.getRecord_id();
     }
 
     public int delete(int record_id) {
