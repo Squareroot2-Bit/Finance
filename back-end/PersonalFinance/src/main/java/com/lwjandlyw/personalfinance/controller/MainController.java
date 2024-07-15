@@ -12,18 +12,14 @@ import com.lwjandlyw.personalfinance.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @ClassName MainController
@@ -122,19 +118,24 @@ public class MainController {
             return new Response(code, message, null);
         }
         Integer record_id = integerBody.getRecord_id();
-        IERecord record = recordService.getRecordByRecordid(record_id);
-        if (record != null && record.getUser_id() == user_id) {
-            int delete = recordService.delete(record_id);
-            if (delete == 1) {
+        int delete = recordService.delete(record_id, user_id);
+        switch (delete) {
+            case 0 -> {
                 code = 0;
                 message = "删除成功";
-            } else {
+            }
+            case -2 -> {
                 code = -2;
                 message = "删除失败";
             }
-        } else {
-            code = -3;
-            message = "无权限删除";
+            case -3 -> {
+                code = -3;
+                message = "无权限删除";
+            }
+            default -> {
+                code = delete;
+                message = "未知错误";
+            }
         }
         return new Response(code, message, null);
     }
@@ -160,7 +161,7 @@ public class MainController {
             LocalDate startDate = LocalDate.parse(startDateStr, FORMATTER);
             LocalDate endDate = LocalDate.parse(endDateStr, FORMATTER);
             List<IERecord> temp =
-                    recordService.getRecordByUserid(user_id, tag, startDate, endDate);
+                    recordService.getRecordsByUserid(user_id, tag, startDate, endDate);
             code = 0;
             message = "查询成功";
             List<IERecord> data = switch (type) {
@@ -193,45 +194,10 @@ public class MainController {
         }
         LocalDate startDate = LocalDate.parse(startDateStr, FORMATTER);
         LocalDate endDate = LocalDate.parse(endDateStr, FORMATTER);
-        List<IERecord> recordList =
-                recordService.getRecordByUserid(user_id, 0, startDate, endDate);
-        ArrayList<SummaryData> summaryDataList =
-                new ArrayList<>(Collections.nCopies(9, null));
-        for (int tag = 0; tag <= MAX_TAG; tag++) {
-            AtomicLong incomeAtomic = new AtomicLong(0);
-            AtomicLong expenditureAtomic = new AtomicLong(0);
-            long income, expenditure, incomeRate, expenditureRate;
-            if (tag == 0) {
-                recordList.stream()
-                        .map(IERecord::getMoney)
-                        .forEach(money -> {
-                            if (money > 0) incomeAtomic.addAndGet(money);
-                            else expenditureAtomic.addAndGet(money);
-                        });
-                income = incomeAtomic.get();
-                expenditure = expenditureAtomic.get();
-                incomeRate = expenditureRate = 10000;
-
-            } else {
-                final int finalTag = tag;
-                recordList.stream()
-                        .filter(record -> finalTag == record.getTag())
-                        .map(IERecord::getMoney)
-                        .forEach(money -> {
-                            if (money > 0) incomeAtomic.addAndGet(money);
-                            else expenditureAtomic.addAndGet(money);
-                        });
-                income = incomeAtomic.get();
-                expenditure = expenditureAtomic.get();
-                incomeRate = income * 10000 / summaryDataList.get(0).getIncome();
-                expenditureRate = expenditure * 10000 / summaryDataList.get(0).getExpenditure();
-            }
-            SummaryData summaryData = new SummaryData(tag, income, expenditure, incomeRate, expenditureRate);
-            summaryDataList.set(tag, summaryData);
-        }
         code = 0;
         message = "查询成功";
-        return new Response(code, message, summaryDataList);
+        SummaryData data = recordService.summary(startDate, endDate, user_id);
+        return new Response(code, message, data);
     }
 
     @PostMapping("/input")
@@ -248,25 +214,46 @@ public class MainController {
             return new Response(code, message, null);
         }
         List<IERecordBody> recordBodyList = recordListBody.getRecordBodyList();
-        List<Integer> recordidList = new ArrayList<>();
-        boolean success = true;
-        for (IERecordBody recordBody : recordBodyList) {
-            int insert = recordService.insert(recordBody, user_id);
-            recordidList.add(insert);
-            if (insert <= 0) {
-                success = false;
-                break;
-            }
-        }
-        if (success) {
+        int input = recordService.input(recordBodyList, user_id);
+        if (input > 0) {
             code = 0;
-            message = "共" + recordBodyList.size() + "条数据导入成功";
+            message = "共" + input + "条数据导入成功";
         } else {
-            recordidList.forEach(record_id -> recordService.delete(record_id));
             code = -2;
             message = "数据导入失败";
         }
         return new Response(code, message, null);
+    }
+
+    @GetMapping("/output/{type}/{tag}/{start-date}/{end-date}")
+    public Response output(@PathVariable("type") Integer type,
+                           @PathVariable("tag") Integer tag,
+                           @PathVariable("start-date") String startDateStr,
+                           @PathVariable("end-date") String endDateStr,
+                           HttpSession session,
+                           HttpServletRequest request,
+                           HttpServletResponse response) {
+        int code;
+        String message;
+        int user_id = verifyingLogin(request);
+        if (user_id < 0) {
+            code = -1;
+            message = "未登录";
+            return new Response(code, message, null);
+        }
+        LocalDate startDate = LocalDate.parse(startDateStr, FORMATTER);
+        LocalDate endDate = LocalDate.parse(endDateStr, FORMATTER);
+        List<IERecord> output = recordService.output(user_id, type, tag, startDate, endDate);
+        if (output != null) {
+            code = 0;
+            message = "共" + output.size() + "条数据导出成功";
+            Object data = output;
+            return new Response(code, message, data);
+        } else {
+            code = -2;
+            message = "导出失败";
+            return new Response(code, message, null);
+        }
     }
 
     int verifyingLogin(HttpServletRequest request) {

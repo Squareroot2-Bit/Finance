@@ -27,14 +27,26 @@ const router = createRouter({
       component: () => import('@/views/HomeView.vue'),
       children: [
         {
+          path: 'summary',
+          name: 'home-summary',
+          meta: {
+            homeList: true,
+            title: '报告',
+            index: 1
+          },
+          component: () => import('@/views/SummaryView.vue')
+        },
+        {
           path: '',
           name: 'home-record',
           meta: {
             homeList: true,
-            title: '记账'
+            title: '记账',
+            index:2
           },
           component: () => import('@/views/RecordView.vue')
-        }
+        },
+        
       ]
     }
   ]

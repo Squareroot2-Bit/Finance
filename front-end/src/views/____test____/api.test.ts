@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach } from 'vitest'
 import $http from '@/http/http_index'
 
 import MockAdapter from 'axios-mock-adapter'
-import { login, logout, register, record ,record_view,record_del} from '@/http/api'
+import { login, logout, register, record ,record_view,record_del, records_upload, } from '@/http/api'
 
 const mock = new MockAdapter($http)
 
@@ -119,13 +119,30 @@ describe('API Functions', () => {
   const response = await record_del(recordData)
   expect(response.data).toEqual(null)
   })
+  it('删除记录失败', async () => {
+    mock.onPost('/record/delete').reply(200, { code: -7, message: '删除记录失败', data: null })
+    const recordData = {record_id: 1}
+    try {
+      await record_del(recordData)
+    } catch (error) {
+      expect(error).toEqual('删除记录失败')
+    }
+    
+  })
+  it('上传记录成功', async () => {
+    mock.onPost('/input').reply(200, { code: 0, message: '上传记录成功', data: null })
+    const recordData = {records: [{date: '20240710', money: 10, tag: 1, remark: ''}]}
+    const response = await records_upload(recordData)
+    expect(response.data).toEqual(null)
+  })
+  it('上传记录失败', async () => {
+    mock.onPost('/input').reply(200, { code: -8, message: '上传记录失败', data: null })
+    const recordData = {records: [{date: '20240710', money: 10, tag: 1, remark: ''}]}
+    try {
+      await records_upload(recordData)
+    } catch (error) {
+      expect(error).toEqual('上传记录失败')
+    }})
+
 })
- it('删除记录失败', async () => {
-  mock.onPost('/record/delete').reply(200, { code: -7, message: '删除记录失败', data: null })
-  const recordData = {record_id: 1}
-  try {
-    await record_del(recordData)
-  } catch (error) {
-    expect(error).toEqual('删除记录失败')
-  }
-})
+ 

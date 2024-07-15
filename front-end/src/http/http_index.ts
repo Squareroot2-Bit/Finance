@@ -8,6 +8,7 @@ enum JSON_STATUS {
   '添加失败' = -4,
   '查询失败'=-5,
   '删除失败' = -6,
+  
 }
 
 const getCurrentUrl = () => {

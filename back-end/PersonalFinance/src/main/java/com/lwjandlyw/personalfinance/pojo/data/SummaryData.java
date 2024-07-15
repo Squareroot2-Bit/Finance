@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * @ClassName SummaryData
  * @Description
@@ -14,9 +16,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SummaryData {
-    int tag;                 //收支类别
-    long income;             //收入，单位为分，为正值
-    long expenditure;        //支出，单位为分，为负值
-    long incomeRate;         //分项收入占总收入比例，单位万分之一
-    long expenditureRate;    //分项支出占总支出比例，单位万分之一
+    List<Long> income;      //每日收入，单位为分，为正值
+    List<Long> expense;     //每日支出，单位为分，为正值
+    long income_sum;        //总收入，单位为分，为正值
+    long expense_sum;       //总支出，单位为分，为正值
+    List<Expense> expense_pie_chart;
 }
+
