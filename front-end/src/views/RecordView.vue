@@ -10,6 +10,7 @@
       start-placeholder="起始日期"
       end-placeholder="结束日期"
       :clearable=false
+      :cell-style="formatMoneyStyle"
     />
   </el-form-item>
   <el-form-item  style="width: 100px;">
@@ -40,11 +41,12 @@
     :data="tableData"
     :default-sort="{ prop: 'date', order: 'descending' }"
     style="width: 100%"
+
   >
     <el-table-column prop="date" label="日期" sortable width="180" />
     <el-table-column prop="income" label="性质" width="100" :formatter="formatIncome"/>
     <el-table-column prop="tag" label="分类" width="100"  :formatter="formatTag"/>
-    <el-table-column prop="money" label="金额" sortable width="150"  :formatter="formatMoney"/>
+    <el-table-column prop="money" label="金额" sortable width="150"  :formatter="formatMoney" />
     <el-table-column prop="remark" label="备注" width="600" />
     <el-table-column fixed="right" label="操作" min-width="120">
       <template #default="scope">
@@ -69,9 +71,10 @@ import { ref, reactive, onMounted, watch } from 'vue';
 import { RecordTag, formatDate, convertToRecordArray} from '@/types/record';
 import UploadRecordView from './UploadRecordView.vue';
 import { record_view, record_del, record } from '@/http/api';
-import type { record_response,output_Record } from '@/types/record';
+import type { record_response } from '@/types/record';
 import type { TableColumnCtx } from 'element-plus';
 import Papa from 'papaparse';
+
 interface view_options {
   income: number;
   tag: number;
@@ -110,8 +113,20 @@ const formatTag = (row: record_response, column: TableColumnCtx<record_response>
 };
 
 const formatMoney = (row: record_response, column: TableColumnCtx<record_response>) => {
-  return row.money / 100;
+  const money = row.money / 100;
+  return money.toFixed(2);
 };
+
+const formatMoneyStyle = (row: record_response, column: TableColumnCtx<record_response>) => {
+      if (row.money > 0) {
+        return { 'color': 'green' };
+      } else if (row.money < 0) {
+        return { 'color': 'red' };
+      } else {
+        return { 'color': 'black' };
+      }
+};
+
 
 const fetchData = async () => {
   const res = await record_view(cache_optionsURL);
@@ -137,6 +152,8 @@ const handleUploadSuccess = (date: string) => {
   fetchData();
 };
 
+
+
 const handleSearch = () => {
   cache_optionsURL = formatViewOptions(view_options_data.value);
   record_view(cache_optionsURL).then(res => {
@@ -146,6 +163,7 @@ const handleSearch = () => {
 };
 
 onMounted(() => {
+  handleSearch();
   const savedData = localStorage.getItem('tableData');
   if (savedData) {
     tableData.value = JSON.parse(savedData);
@@ -196,4 +214,4 @@ document.body.removeChild(link);
     border-left: 1px solid #ccc;
   }
 }
-</style >: any: { money: number; }: any
+</style >

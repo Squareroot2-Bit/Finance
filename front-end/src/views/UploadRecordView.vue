@@ -95,7 +95,9 @@ const rules = reactive({
 })
 
 const formatUploadDate = (date: Date) => {
-  if(date){recordForm.date = formatDate(date)}
+  if(date){
+    // console.log(date.toISOString())
+    recordForm.date = formatDate(date)}
 }
 const disabledDate = (date: Date) => {
   return date.getTime()> Date.now()
@@ -141,32 +143,7 @@ const validateHeaders = (headers: string[]) => {
 };
 
 const fileList = ref<UploadUserFile[]>([])
-  // const handleChange: UploadProps['onChange'] = (uploadFile) => {
-  //   console.log("-----")
-  //   const reader= new FileReader()
-  //   reader.onload = (e) => {
-  //   const csvData = (e.target as FileReader).result as string;
-  //   Papa.parse(csvData, {
-  //     header: true,
-  //     dynamicTyping: true,
-  //     complete: (result) => {
-  //       const headers = result.meta.fields;
-  //       if (!headers) {
-  //         throw new Error("CSV file missing headers");
-  //       }
-  //       try {
-  //         validateHeaders(headers);
-  //         const jsonData = convertToUploadeRecordArray(result.data);
 
-  //         console.log("Valid JSON data:", jsonData);
-  //       } catch (error) {
-  //         console.error("Validation error:", error);
-  //       }}})
-  // };
-  // if (uploadFile.raw) {
-  //   reader.readAsText(uploadFile.raw);
-  // }
-  //   }
   const handleRequest = async (options: UploadRequestOptions) => {
   const { file } = options;
   
@@ -185,6 +162,8 @@ const fileList = ref<UploadUserFile[]>([])
           records_upload({recordBodyList:jsonData}).then(res => {
             console.log(res)
             ElMessage.success('上传成功')
+            const date = new Date(recordForm.date)
+            emit('upload-success',date)
           }).catch(err => {
             console.log(err)
             // ElMessage.error('上传失败')

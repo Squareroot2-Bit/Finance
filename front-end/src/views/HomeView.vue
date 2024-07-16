@@ -10,6 +10,7 @@ const Name = localStorage.getItem('token')
 const homeRouter = useRouter()
 const list = homeRouter.getRoutes().filter((v) => v.meta.homeList)
 console.log(list)
+list.sort((a:any, b:any) => b.meta.index - a.meta.index)
 function userLogout() {
   // logout()
   //   .then((res) => {
@@ -56,7 +57,7 @@ function userLogout() {
       </el-header>
       <el-container>
         <el-aside width="150px">
-          <el-menu default-active="2" class="menu" router>
+          <el-menu default-active="1" class="menu" router>
             <el-menu-item v-for="item in list" :key="item.path" :index="item.path">
               <span>{{ item.meta.title }}</span>
             </el-menu-item>
