@@ -151,6 +151,5 @@ class IERecordServiceTest {
                     .filter(record -> !record.isIncome())
                     .count();
         }
-
     }
 }
