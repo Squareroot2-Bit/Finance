@@ -26,10 +26,12 @@
     show-word-limit></el-input>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" style="width: 100%; margin-top: 20px;" @click="submitForm(recordFormRef)">提交</el-button>
+      <el-button name="submit" type="primary" style="width: 100%; margin-top: 20px;" @click="submitForm(recordFormRef)">提交</el-button>
     </el-form-item>
   </el-form>
   <el-upload
+  name="file"
+    ref="uploadRef"
     class="upload-demo"
     drag
     action="#"
