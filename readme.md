@@ -93,3 +93,15 @@
 [结对开发的问题与思考](https://se.bitcs.net.cn/se2024/finance/finance-05/-/wikis/项目收尾与验收/项目自评/结对开发的问题与思考)
 
 [结对编程项目自评与复盘](https://se.bitcs.net.cn/se2024/finance/finance-05/-/wikis/项目收尾与验收/项目自评/结对编程项目自评与复盘)
+
+## 项目互评
+
+[个人理财-01](https://se.bitcs.net.cn/se2024/finance/finance-05/-/wikis/项目互评/个人理财-01)
+
+[个人理财-02](https://se.bitcs.net.cn/se2024/finance/finance-05/-/wikis/项目互评/个人理财-02)
+
+[个人理财-03](https://se.bitcs.net.cn/se2024/finance/finance-05/-/wikis/项目互评/个人理财-03)
+
+[个人理财-04](https://se.bitcs.net.cn/se2024/finance/finance-05/-/wikis/项目互评/个人理财-04)
+
+[个人理财-06](https://se.bitcs.net.cn/se2024/finance/finance-05/-/wikis/项目互评/个人理财-06)
